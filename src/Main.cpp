@@ -1,12 +1,23 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <stdlib.h>
-#include <math.h>
+#include <iostream>
+#include <fstream>
 #include <getopt.h>
 #include <string.h>
-#include "matrix.h"
 #include "memlog.h" 
 #include "msgassert.h" 
+#include "CONSTANTS.hpp"
+#include "Vector.hpp"
+#include "List.hpp"
+
+std::string stringToLower(std::string initialString) {
+  for (std::string::size_type i = 0; i < initialString.size(); i++) {
+    initialString[i] = tolower(initialString[i]);
+  }
+
+  return initialString;
+}
 
 struct ConfigStruct {
   int quickSortPivot, algorithmBreakpoint;
@@ -49,11 +60,11 @@ void parse_args(int argc,char ** argv) {
         break;
       case 'm':
         warnAssert(config.quickSortPivot==-1,"Invalid Quick Sort pivot median provided");
-        config.quickSortPivot = (int)(optarg);
+        config.quickSortPivot = atoi(optarg);
         break;
       case 's':
         warnAssert(config.algorithmBreakpoint==-1,"Invalid Breakpoint Size provided");
-        config.algorithmBreakpoint = (int)(optarg);
+        config.algorithmBreakpoint = atoi(optarg);
         break;
       case 'l': 
         config.regmem = true;
@@ -70,6 +81,110 @@ void parse_args(int argc,char ** argv) {
     "Analyse and Sort - output file name must be previously defined");
 }
 
+Vector* readLexicographicalOrderBlock(
+  std::ifstream &inputFile, 
+  std::string &buffer
+) {
+  Vector *lexicographicalOrderTest = new Vector(ALPHABET_DEFAULT_SIZE);
+
+  for(int i = 0; i < ALPHABET_DEFAULT_SIZE; i++) {
+    inputFile >> buffer;
+    lexicographicalOrderTest->pushBack(stringToLower(buffer));
+  }
+
+  inputFile >> buffer;
+
+  return lexicographicalOrderTest;
+}
+
+Vector* readTextContentBlock(std::ifstream &inputFile, std::string &buffer) {
+  List wordsList = List();
+  while (!inputFile.eof()) {
+    inputFile >> buffer;
+
+    if(buffer == LEXICOGRAPHICAL_BLOCK_DELIMITER) break;
+
+    wordsList.pushBack(stringToLower(buffer));
+  }
+  
+  return wordsList.retrieveListAsVector();
+}
+
+struct InterfaceInputFileHandler {
+  Vector* lexicographicalOrder;
+  Vector* textWords;
+};
+
+InterfaceInputFileHandler inputFileHandler(char inputFileName[]) {
+  std::ifstream inputFile(inputFileName);
+  errorAssert(inputFile.is_open(), "\nFailed to open input file");
+
+  Vector* lexicographicalOrder;
+  Vector* textWords;
+
+  std::string buffer;
+
+  inputFile >> buffer;
+  if(buffer == LEXICOGRAPHICAL_BLOCK_DELIMITER) {
+    lexicographicalOrder = readLexicographicalOrderBlock(inputFile, buffer);
+
+    if(buffer == TEXT_BLOCK_DELIMITER)
+      textWords = readTextContentBlock(inputFile, buffer);
+  } else if(buffer == TEXT_BLOCK_DELIMITER) {
+    textWords = readTextContentBlock(inputFile, buffer);
+
+    if(buffer == LEXICOGRAPHICAL_BLOCK_DELIMITER)
+      lexicographicalOrder = readLexicographicalOrderBlock(inputFile, buffer);
+  }
+
+  inputFile.close();
+  return InterfaceInputFileHandler {lexicographicalOrder, textWords};
+}
+
+void sortWordsAccordingToLexOrder(
+  Vector* lexicographicalOrder, 
+  Vector* textWords
+) {
+  errorAssert(lexicographicalOrder->length() == ALPHABET_DEFAULT_SIZE, 
+    "Lexicographical Order Vector must be fully filled");
+  errorAssert(textWords > 0, "Text Word Vector must have at least one word");
+
+  textWords->setLexicographicalSortOrder(lexicographicalOrder);
+
+  for(int i = 0; i < ALPHABET_DEFAULT_SIZE; i++) {
+    std::cout << lexicographicalOrder->getElement(i) << " ";
+  }
+  std::cout << std::endl;
+
+  textWords->sortVector();
+
+  for(int i = 0; i < textWords->length(); i++) {
+    std::cout << textWords->getElement(i) << " ";
+  }
+  std::cout << std::endl;
+}
+
+void printOutputResult(Vector* textWords, char outputFileName[]) {
+  std::ofstream outFile(outputFileName);
+  errorAssert(outFile.is_open(), "\nFailed to open output file");
+
+  int currentWordRepetitionsAcc = 1;
+  for (int i = 1; i < textWords->length(); i++) {
+    if(textWords->getElement(i) == textWords->getElement(i-1)) {
+      currentWordRepetitionsAcc++;
+    } else {
+      outFile << textWords->getElement(i-1) << " " << currentWordRepetitionsAcc << std::endl;
+      currentWordRepetitionsAcc = 1;
+    }
+  }
+
+  // necessary since the for iterator prints the word minus one, so, to print the last word, the line below is necessary
+  outFile << textWords->getElement(textWords->length()-1) << " " << currentWordRepetitionsAcc << std::endl;
+
+  outFile << "#FIM" << std::endl;
+
+  outFile.close();
+}
 
 
 int main(int argc, char ** argv) {
@@ -81,6 +196,15 @@ int main(int argc, char ** argv) {
     activateMemLog();
   else 
     deactivateMemLog();
+  
+  InterfaceInputFileHandler inputReadVectors = inputFileHandler(config.inputFile);
+
+  sortWordsAccordingToLexOrder(
+    inputReadVectors.lexicographicalOrder, 
+    inputReadVectors.textWords
+  );
+
+  printOutputResult(inputReadVectors.textWords, config.outputFile);
 
   return endUpMemLog();
 }
