@@ -11,6 +11,38 @@
 #include "Vector.hpp"
 #include "List.hpp"
 
+bool isValidWordCharacter(char c) {
+  switch (c) {
+  case ',':
+    return false;
+  case '.':
+    return false;
+  case '!':
+    return false;
+  case '?':
+    return false;
+  case ':':
+    return false;
+  case ';':
+    return false;
+  case '_':
+    return false;
+  default:
+    return true;
+  }
+}
+
+std::string formatWord(std::string initialString) {
+  std::string outputString;
+  outputString.reserve(initialString.size());
+  for(std::string::size_type i = 0; i < initialString.size(); ++i) {
+    if(isValidWordCharacter(initialString[i])) 
+      outputString += tolower(initialString[i]);
+  }
+
+  return outputString;
+}
+
 std::string stringToLower(std::string initialString) {
   for (std::string::size_type i = 0; i < initialString.size(); i++) {
     initialString[i] = tolower(initialString[i]);
@@ -104,7 +136,7 @@ Vector* readTextContentBlock(std::ifstream &inputFile, std::string &buffer) {
 
     if(buffer == LEXICOGRAPHICAL_BLOCK_DELIMITER) break;
 
-    wordsList.pushBack(stringToLower(buffer));
+    wordsList.pushBack(formatWord(buffer));
   }
   
   return wordsList.retrieveListAsVector();
