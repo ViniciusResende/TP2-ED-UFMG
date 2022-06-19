@@ -80,6 +80,7 @@ class Vector {
     void quickSortRecursive(int leftIdx, int rightIdx);
     int getGreaterWord(std::string firstWord, std::string secondWord);
     int normalizeCharacter(char c);
+    void insertionSort(int leftIdx, int rightIdx);
 };
 
 #endif

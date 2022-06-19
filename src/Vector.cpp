@@ -95,6 +95,23 @@ int Vector::getGreaterWord(std::string firstWord, std::string secondWord) {
   return SECOND_WORD_IS_GREATER;
 }
 
+void Vector::insertionSort(int leftIdx, int rightIdx) {
+  int i, j;
+  std::string aux;
+
+  for (i = leftIdx + 1; i < rightIdx + 1; i++) {
+    aux = this->value[i];
+    j = i - 1;
+
+    while ((j >= 0) && (getGreaterWord(aux, this->value[j]) == SECOND_WORD_IS_GREATER)) {
+      this->value[j + 1] = this->value[j];
+      j--;
+    }
+    
+    this->value[j + 1] = aux;
+  }
+}
+
 void Vector::quickSortRecursive(int leftIdx, int rightIdx) {
   int pivotIdx = (leftIdx + rightIdx) / 2;
   std::string pivot = this->value[pivotIdx];
