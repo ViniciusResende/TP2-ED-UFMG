@@ -52,7 +52,7 @@ std::string stringToLower(std::string initialString) {
 }
 
 struct ConfigStruct {
-  int quickSortPivot, algorithmBreakpoint;
+  int quickSortPivot, sortingAlgorithmBreakpoint;
   bool regmem;
   char inputFile[100], outputFile[100], logname[100] = "/tmp/analyse_sort_log.out";
 };
@@ -75,7 +75,7 @@ void parse_args(int argc,char ** argv) {
   int c;
 
   config.quickSortPivot = -1;
-  config.algorithmBreakpoint = -1;
+  config.sortingAlgorithmBreakpoint = 3;
   config.regmem = false;
   config.inputFile[0] = 0;
   config.outputFile[0] = 0;
@@ -95,8 +95,8 @@ void parse_args(int argc,char ** argv) {
         config.quickSortPivot = atoi(optarg);
         break;
       case 's':
-        warnAssert(config.algorithmBreakpoint==-1,"Invalid Breakpoint Size provided");
-        config.algorithmBreakpoint = atoi(optarg);
+        warnAssert(config.sortingAlgorithmBreakpoint > 0,"Invalid Breakpoint Size provided");
+        config.sortingAlgorithmBreakpoint = atoi(optarg);
         break;
       case 'l': 
         config.regmem = true;
@@ -230,6 +230,8 @@ int main(int argc, char ** argv) {
     deactivateMemLog();
   
   InterfaceInputFileHandler inputReadVectors = inputFileHandler(config.inputFile);
+
+  inputReadVectors.textWords->setSortingAlgorithmBreakpoint(config.sortingAlgorithmBreakpoint);
 
   sortWordsAccordingToLexOrder(
     inputReadVectors.lexicographicalOrder, 

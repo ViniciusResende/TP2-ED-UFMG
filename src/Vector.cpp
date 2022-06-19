@@ -15,6 +15,7 @@ Vector::Vector(int size) {
   this->value = (std::string*) malloc(this->size * sizeof(std::string));
 
   this->lastInputedIndex = -1;
+  this->sortingAlgorithmBreakpoint = 3;
 }
 
 int Vector::length() {
@@ -130,6 +131,11 @@ void Vector::quickSortRecursive(int leftIdx, int rightIdx) {
     }
   }
 
+  if(rightIdx - leftIdx <= sortingAlgorithmBreakpoint) {
+    this->insertionSort(leftIdx, rightIdx);
+    return;
+  }
+
   if(j > leftIdx)
     this->quickSortRecursive(leftIdx, j);
   
@@ -149,6 +155,14 @@ void Vector::setLexicographicalSortOrder(Vector* lexicographicalSortOrder) {
   errorAssert(lexicographicalSortOrder->length() == ALPHABET_DEFAULT_SIZE, 
     "Invalid size provided to Vector lexicographical sort order");
   this->lexicographicalSortOrder = lexicographicalSortOrder;
+}
+
+void  Vector::setSortingAlgorithmBreakpoint(int sortingAlgorithmBreakpoint) {
+  bool isValueValid = sortingAlgorithmBreakpoint >= 1;
+  warnAssert(isValueValid, "Invalid value for sorting algorithm breakpoint, keeping default of 3");
+
+  if(isValueValid) 
+    this->sortingAlgorithmBreakpoint = sortingAlgorithmBreakpoint;
 }
 
 Vector::~Vector() {
