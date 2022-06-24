@@ -63,6 +63,7 @@ class Vector {
 
     void setLexicographicalSortOrder(Vector* lexicographicalSortOrder);
     void setSortingAlgorithmBreakpoint(int sortingAlgorithmBreakpoint);
+    void setPivotChoiceRange(int pivotChoiceRange);
 
     /**
      * @brief Default destructor of the class, that will clean it up when called and free the allocated memory.
@@ -73,6 +74,7 @@ class Vector {
     std::string* value;
     int size;
     int lastInputtedIndex;
+    int pivotChoiceRange;
     int sortingAlgorithmBreakpoint;
     static int _id;
     int id;

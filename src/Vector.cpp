@@ -16,6 +16,7 @@ Vector::Vector(int size) {
 
   this->lastInputtedIndex = -1;
   this->sortingAlgorithmBreakpoint = 3;
+  this->pivotChoiceRange = 1;
 }
 
 int Vector::length() {
@@ -114,8 +115,17 @@ void Vector::insertionSort(int leftIdx, int rightIdx) {
 }
 
 void Vector::quickSortRecursive(int leftIdx, int rightIdx) {
-  int pivotIdx = (leftIdx + rightIdx) / 2;
-  std::string pivot = this->value[pivotIdx];
+  std::string pivot;
+  int pivotIdx;
+  if((this->pivotChoiceRange != 1) && (rightIdx - leftIdx >= this->pivotChoiceRange)) {
+    this->insertionSort(0, this->pivotChoiceRange);
+
+    pivotIdx = (0 + this->pivotChoiceRange) / 2;
+    pivot = this->value[pivotIdx];
+  } else {
+    pivotIdx = (leftIdx + rightIdx) / 2;
+    pivot = this->value[pivotIdx];
+  }
 
   int i = leftIdx, j = rightIdx;
 
@@ -165,8 +175,16 @@ void  Vector::setSortingAlgorithmBreakpoint(int sortingAlgorithmBreakpoint) {
     this->sortingAlgorithmBreakpoint = sortingAlgorithmBreakpoint;
 }
 
+void  Vector::setPivotChoiceRange(int pivotChoiceRange) {
+  bool isValueValid = pivotChoiceRange >= 1;
+  warnAssert(isValueValid, "Invalid value for pivot choice range, keeping default of 1");
+
+  if(isValueValid) 
+    this->pivotChoiceRange = pivotChoiceRange;
+}
+
 Vector::~Vector() {
-  warnAssert(this->size > 0, "Vector has already been destoyed");
+  warnAssert(this->size > 0, "Vector has already been destroyed");
 
   this->id = this->size = -1;
 

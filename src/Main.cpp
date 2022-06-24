@@ -182,6 +182,8 @@ void sortWordsAccordingToLexOrder(
   errorAssert(textWords > 0, "Text Word Vector must have at least one word");
 
   textWords->setLexicographicalSortOrder(lexicographicalOrder);
+  textWords->setSortingAlgorithmBreakpoint(config.sortingAlgorithmBreakpoint);
+  textWords->setPivotChoiceRange(config.quickSortPivot);
 
   for(int i = 0; i < ALPHABET_DEFAULT_SIZE; i++) {
     std::cout << lexicographicalOrder->getElement(i) << " ";
@@ -230,8 +232,6 @@ int main(int argc, char ** argv) {
     deactivateMemLog();
   
   InterfaceInputFileHandler inputReadVectors = inputFileHandler(config.inputFile);
-
-  inputReadVectors.textWords->setSortingAlgorithmBreakpoint(config.sortingAlgorithmBreakpoint);
 
   sortWordsAccordingToLexOrder(
     inputReadVectors.lexicographicalOrder, 
