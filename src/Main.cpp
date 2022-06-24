@@ -60,7 +60,7 @@ struct ConfigStruct {
 ConfigStruct config;
 
 void menu() {
-  fprintf(stderr,"Analyse and Sort\n");
+  fprintf(stderr,"Analyze and Sort\n");
   fprintf(stderr,"-[i|I] <file>\t(Input File)\n");
   fprintf(stderr,"-[o|O] <file>\t(output matrix file)\n");
   fprintf(stderr,"-[m|M] <number>\t(Quick Sort Pivot Median)\n");
@@ -108,9 +108,9 @@ void parse_args(int argc,char ** argv) {
     }
 
   errorAssert(strlen(config.inputFile) > 0,
-    "Analyse and Sort - input file name must be previously defined");
+    "Analyze and Sort - input file name must be previously defined");
   errorAssert(strlen(config.outputFile) > 0,
-    "Analyse and Sort - output file name must be previously defined");
+    "Analyze and Sort - output file name must be previously defined");
 }
 
 Vector* readLexicographicalOrderBlock(

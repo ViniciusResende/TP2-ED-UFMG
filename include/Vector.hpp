@@ -17,7 +17,7 @@ class Vector {
     Vector(int size);
 
     /**
-     * @brief Returns the total lenght of the Vector.
+     * @brief Returns the total length of the Vector.
      *
      * @return Returns the value of the class attribute "size".
      */
@@ -27,7 +27,7 @@ class Vector {
      *
      * @return Returns the value true if the vector is already full filled and false if its not.
      */
-    bool vectorIsFullfilled();
+    bool vectorIsFulfilled();
     /**
      * @brief Util method that is responsible for iterating over the Vector elements 
      * stacking their allocated memory.
@@ -72,7 +72,7 @@ class Vector {
   private:
     std::string* value;
     int size;
-    int lastInputedIndex;
+    int lastInputtedIndex;
     int sortingAlgorithmBreakpoint;
     static int _id;
     int id;

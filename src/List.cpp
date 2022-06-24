@@ -72,7 +72,7 @@ Vector* List::retrieveListAsVector() {
 }
 
 ListCell* List::setPosition(int idx, bool before) {
-  errorAssert((idx >= 0) && (idx < this->size), "Invalid index while seting position on List");
+  errorAssert((idx >= 0) && (idx < this->size), "Invalid index while setting position on List");
   
   ListCell *cellPointer = this->head;
   
@@ -87,7 +87,7 @@ ListCell* List::setPosition(int idx, bool before) {
 }
 
 List::~List() {
-  warnAssert(this->size > 0, "List has already been destoyed");
+  warnAssert(this->size > 0, "List has already been destroyed");
   ListCell *cellPointer = this->head->next;
 
   while (cellPointer != nullptr) {

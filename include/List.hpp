@@ -15,7 +15,7 @@ class List {
     List();
 
     /**
-     * @brief Returns the current lenght of the List.
+     * @brief Returns the current length of the List.
      *
      * @return Returns the value of the class attribute "size".
      */

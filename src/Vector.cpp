@@ -14,7 +14,7 @@ Vector::Vector(int size) {
 
   this->value = (std::string*) malloc(this->size * sizeof(std::string));
 
-  this->lastInputedIndex = -1;
+  this->lastInputtedIndex = -1;
   this->sortingAlgorithmBreakpoint = 3;
 }
 
@@ -22,8 +22,8 @@ int Vector::length() {
   return this->size;
 }
 
-bool Vector::vectorIsFullfilled() {
-  return (this->size - 1) == this->lastInputedIndex;
+bool Vector::vectorIsFulfilled() {
+  return (this->size - 1) == this->lastInputtedIndex;
 }
 
 std::string Vector::warmUpVector() {  
@@ -41,15 +41,15 @@ void Vector::setElement(int idx, std::string value) {
 
   this->value[idx] = value;
 
-  if(idx > this->lastInputedIndex)
-    this->lastInputedIndex = idx;
+  if(idx > this->lastInputtedIndex)
+    this->lastInputtedIndex = idx;
 }
 
 void Vector::pushBack(std::string value) {
-  errorAssert(this->lastInputedIndex < this->size, "Alocated Vector is already full");
+  errorAssert(this->lastInputtedIndex < this->size, "Allocated Vector is already full");
 
-  this->lastInputedIndex += 1;
-  this->value[this->lastInputedIndex] = value;
+  this->lastInputtedIndex += 1;
+  this->value[this->lastInputtedIndex] = value;
 }
 
 std::string Vector::getElement(int idx) {
