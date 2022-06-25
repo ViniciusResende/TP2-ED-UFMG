@@ -14,6 +14,10 @@
 #define ASCII_OF_FIRST_LETTER 65
 #endif
 
+#ifndef ASCII_OF_LAST_LETTER
+#define ASCII_OF_LAST_LETTER 122
+#endif
+
 #ifndef FIRST_WORD_IS_GREATER
 #define FIRST_WORD_IS_GREATER 1
 #endif

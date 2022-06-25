@@ -64,6 +64,9 @@ int Vector::normalizeCharacter(char c) {
 
   if(asciiChar < ASCII_OF_FIRST_LETTER)
     return asciiChar - ASCII_OF_FIRST_LETTER;
+  
+  if(asciiChar > ASCII_OF_LAST_LETTER)
+    return asciiChar;
 
   for (int i = 0; i < ALPHABET_DEFAULT_SIZE; i++) {
     if(c == this->lexicographicalSortOrder->getElement(i).front())
