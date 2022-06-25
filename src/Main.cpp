@@ -11,6 +11,14 @@
 #include "Vector.hpp"
 #include "List.hpp"
 
+/**
+ * @brief Returns a boolean value according to the validity 
+ * of the character in the context of the application.
+ *
+ * @param c Character to be validated.
+ * 
+ * @return Returns true wherever the character is valid and false wherever not.
+ */
 bool isValidWordCharacter(char c) {
   switch (c) {
   case ',':
@@ -32,6 +40,13 @@ bool isValidWordCharacter(char c) {
   }
 }
 
+/**
+ * @brief Helper function that will remove unexpected characters and symbols given an word.
+ *
+ * @param initialString Word to be formatted.
+ * 
+ * @return Returns the word correctly formatted.
+ */
 std::string formatWord(std::string initialString) {
   std::string outputString;
   outputString.reserve(initialString.size());
@@ -43,6 +58,13 @@ std::string formatWord(std::string initialString) {
   return outputString;
 }
 
+/**
+ * @brief Helper function that will return a given string with its characters on lowercase.
+ *
+ * @param initialString String to be formatted.
+ * 
+ * @return Returns the string correctly formatted.
+ */
 std::string stringToLower(std::string initialString) {
   for (std::string::size_type i = 0; i < initialString.size(); i++) {
     initialString[i] = tolower(initialString[i]);
@@ -59,6 +81,9 @@ struct ConfigStruct {
 
 ConfigStruct config;
 
+/**
+ * @brief Print at console the possible parameters of the application and describe them.
+ */
 void menu() {
   fprintf(stderr,"Analyze and Sort\n");
   fprintf(stderr,"-[i|I] <file>\t(Input File)\n");
@@ -68,7 +93,12 @@ void menu() {
   fprintf(stderr,"-l \t\t(register memory access)\n");
 }
 
-
+/**
+ * @brief Function responsible to read run time parameters and set config values.
+ * 
+ * @param argc Number of run time parameters.
+ * @param argv Array with run time parameters.
+ */
 void parse_args(int argc,char ** argv) {
   extern char * optarg;
 
@@ -113,6 +143,15 @@ void parse_args(int argc,char ** argv) {
     "Analyze and Sort - output file name must be previously defined");
 }
 
+/**
+ * @brief Function responsible for reading the lexicographical order block of a 
+ * given input file and return a Vector with those values.
+ *
+ * @param inputFile A reference to an input file of ifstream type, to read the lexicographical order info.
+ * @param buffer String used to store the value being currently read from the input file.
+ * 
+ * @return Returns the Vector with the correct lexicographical order.
+ */
 Vector* readLexicographicalOrderBlock(
   std::ifstream &inputFile, 
   std::string &buffer
@@ -129,6 +168,15 @@ Vector* readLexicographicalOrderBlock(
   return lexicographicalOrderTest;
 }
 
+/**
+ * @brief Function responsible for reading the text block of a given input file 
+ * and return a Vector containing the read text words.
+ *
+ * @param inputFile A reference to an input file of ifstream type, to read the text content.
+ * @param buffer String used to store the value being currently read from the input file.
+ * 
+ * @return Returns the Vector with the formatted text words.
+ */
 Vector* readTextContentBlock(std::ifstream &inputFile, std::string &buffer) {
   List wordsList = List();
   while (!inputFile.eof()) {
@@ -147,6 +195,15 @@ struct InterfaceInputFileHandler {
   Vector* textWords;
 };
 
+/**
+ * @brief Function responsible for opening an given input file and return an 
+ * interface containing its lexicographical order Vector and its text words Vector.
+ *
+ * @param inputFileName A string containing the execution input file name.
+ * 
+ * @return Returns an interface containing a Vector with the read lexicographical 
+ * order and a Vector with the read text words.
+ */
 InterfaceInputFileHandler inputFileHandler(char inputFileName[]) {
   std::ifstream inputFile(inputFileName);
   errorAssert(inputFile.is_open(), "\nFailed to open input file");
@@ -173,6 +230,14 @@ InterfaceInputFileHandler inputFileHandler(char inputFileName[]) {
   return InterfaceInputFileHandler {lexicographicalOrder, textWords};
 }
 
+/**
+ * @brief Function responsible for ordering the text words 
+ * according to the passed lexicographical order.
+ *
+ * @param lexicographicalOrder Vector containing lexicographical order 
+ * to be followed in the sorting.
+ * @param textWords A Vector containing the text words to be sorted.
+ */
 void sortWordsAccordingToLexOrder(
   Vector* lexicographicalOrder, 
   Vector* textWords
@@ -198,6 +263,13 @@ void sortWordsAccordingToLexOrder(
   std::cout << std::endl;
 }
 
+/**
+ * @brief Function responsible for printing in a given output file, the 
+ * text words in the order they're given followed by the times they repeat.
+ *
+ * @param textWords A Vector containing the text words to be read an printed.
+ * @param outputFileName A string containing the execution output file name.
+ */
 void printOutputResult(Vector* textWords, char outputFileName[]) {
   std::ofstream outFile(outputFileName);
   errorAssert(outFile.is_open(), "\nFailed to open output file");
@@ -220,7 +292,14 @@ void printOutputResult(Vector* textWords, char outputFileName[]) {
   outFile.close();
 }
 
-
+/**
+ * @brief Main Function: Responsible for initializing the MemLog lib depending on the run-time 
+ * parameters and calling the functions inputReadVectors followed by 
+ * sortWordsAccordingToLexOrder, and finally printOutputResult.
+ * 
+ * @param argc Number of run time parameters.
+ * @param argv Array with run time parameters.
+ */
 int main(int argc, char ** argv) {
   parse_args(argc,argv);
 
@@ -242,4 +321,3 @@ int main(int argc, char ** argv) {
 
   return endUpMemLog();
 }
-
