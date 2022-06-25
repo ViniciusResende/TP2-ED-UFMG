@@ -57,12 +57,27 @@ class Vector {
      */
     void pushBack(std::string value);
     /**
-     * @brief Method responsible for ordering the value of the Vector in ascending order. 
+     * @brief Method responsible for ordering the value of the Vector according to its lexicographical order. 
      */
     void sortVector();
-
+    /**
+     * @brief Method responsible for setting the lexicographical order used for sorting of the Vector. 
+     *
+     * @param lexicographicalSortOrder Vector containing the alphabet letters in the order wanted to sort the current Vector.
+     */
     void setLexicographicalSortOrder(Vector* lexicographicalSortOrder);
+    /**
+     * @brief Method responsible for setting the breakpoint of use of sorting algorithms (Quick Sort -> Insertion Sort). 
+     *
+     * @param sortingAlgorithmBreakpoint Integer value containing the breakpoint of use of sorting algorithms.
+     */
     void setSortingAlgorithmBreakpoint(int sortingAlgorithmBreakpoint);
+    /**
+     * @brief Method responsible for setting the number of elements considered in the pick of the pivot at Quicksort sorting. 
+     *
+     * @param pivotChoiceRange Integer value containing the number of elements considered 
+     * in the pick of the pivot at Quicksort sorting.
+     */
     void setPivotChoiceRange(int pivotChoiceRange);
 
     /**
@@ -80,10 +95,43 @@ class Vector {
     int id;
     Vector* lexicographicalSortOrder;
 
+    /**
+     * @brief Sorting method that implements the well known algorithm Quick Sort in the Current Vector. 
+     */
     void quickSort();
+    /**
+     * @brief Quick Sort algorithm implemented in its recursive way. 
+     *
+     * @param leftIdx Index of the most left element in the partitioned Vector.
+     * @param leftIdx Index of the most right element in the partitioned Vector.
+     */
     void quickSortRecursive(int leftIdx, int rightIdx);
+    /**
+     * @brief Compare the "greatness" of two words according to the lexicographicalSortOrder attribute. 
+     *
+     * @param firstWord First word being compared.
+     * @param secondWord Second word being compared.
+     * 
+     * @return Returns 1 if the first word is greater, 2 if the second is greater and 0 if they're equal.
+     */
     int getGreaterWord(std::string firstWord, std::string secondWord);
+    /**
+     * @brief Normalize a character to an integer representing its "greatness" 
+     * according to the Vector lexicographical order. 
+     *
+     * @param c Character to be normalized.
+     * 
+     * @return Returns an integer representing the character "greatness" 
+     * according to the Vector lexicographical order.
+     */
     int normalizeCharacter(char c);
+    /**
+     * @brief Sorting method that implements the well known algorithm Insertion Sort 
+     * in the Current Vector, given an start and end index. 
+     *
+     * @param leftIdx Index of the most left element in the partitioned Vector.
+     * @param leftIdx Index of the most right element in the partitioned Vector.
+     */
     void insertionSort(int leftIdx, int rightIdx);
 };
 
