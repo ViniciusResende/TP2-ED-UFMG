@@ -121,9 +121,9 @@ void Vector::quickSortRecursive(int leftIdx, int rightIdx) {
   std::string pivot;
   int pivotIdx;
   if((this->pivotChoiceRange != 1) && (rightIdx - leftIdx >= this->pivotChoiceRange)) {
-    this->insertionSort(0, this->pivotChoiceRange);
+    this->insertionSort(leftIdx, leftIdx + this->pivotChoiceRange);
 
-    pivotIdx = (0 + this->pivotChoiceRange) / 2;
+    pivotIdx = (leftIdx + (leftIdx + this->pivotChoiceRange)) / 2;
     pivot = this->value[pivotIdx];
   } else {
     pivotIdx = (leftIdx + rightIdx) / 2;
