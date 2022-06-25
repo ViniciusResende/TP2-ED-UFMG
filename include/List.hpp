@@ -41,6 +41,12 @@ class List {
      */
     std::string popFront();
 
+    /**
+     * @brief Method responsible for copying the values of the List and attributing them to 
+     * a correspondent index in a new made Vector with the same size of the List.
+     *
+     * @return Returns the new made Vector containing the elements of the List.
+     */
     Vector* retrieveListAsVector();
     
     /**
