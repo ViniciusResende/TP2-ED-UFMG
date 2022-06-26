@@ -18,6 +18,8 @@ int List::length() {
 }
 
 std::string List::getElement(int idx) {
+  errorAssert((idx >= 0) && (idx < this->size), "Invalid List index while getting element");
+
   ListCell *cellPointer;
 
   cellPointer = this->setPosition(idx, false);
@@ -56,7 +58,7 @@ std::string List::popFront() {
 }
 
 Vector* List::retrieveListAsVector() {
-  errorAssert(this->size > 0, "Can't create a Vector from an empty list");
+  errorAssert(this->size > 0, "Can't create a Vector from an empty List");
 
   Vector *newVec = new Vector(this->size);
   

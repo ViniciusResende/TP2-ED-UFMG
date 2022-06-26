@@ -48,6 +48,8 @@ bool isValidWordCharacter(char c) {
  * @return Returns the word correctly formatted.
  */
 std::string formatWord(std::string initialString) {
+  warnAssert(initialString.size() > 0, "You shouldn't format an empty word");
+  
   std::string outputString;
   outputString.reserve(initialString.size());
   for(std::string::size_type i = 0; i < initialString.size(); ++i) {
@@ -66,6 +68,8 @@ std::string formatWord(std::string initialString) {
  * @return Returns the string correctly formatted.
  */
 std::string stringToLower(std::string initialString) {
+  warnAssert(initialString.size() > 0, "You shouldn't convert an empty word to lower case");
+
   for (std::string::size_type i = 0; i < initialString.size(); i++) {
     initialString[i] = tolower(initialString[i]);
   }
@@ -105,7 +109,7 @@ void parse_args(int argc,char ** argv) {
   int c;
 
   config.quickSortPivot = -1;
-  config.sortingAlgorithmBreakpoint = 3;
+  config.sortingAlgorithmBreakpoint = -1;
   config.regmem = false;
   config.inputFile[0] = 0;
   config.outputFile[0] = 0;
@@ -121,11 +125,11 @@ void parse_args(int argc,char ** argv) {
         strcpy(config.outputFile, optarg);
         break;
       case 'm':
-        warnAssert(config.quickSortPivot==-1,"Invalid Quick Sort pivot median provided");
+        errorAssert(atoi(optarg) > 0, "Invalid Quick Sort pivot median provided");
         config.quickSortPivot = atoi(optarg);
         break;
       case 's':
-        warnAssert(config.sortingAlgorithmBreakpoint > 0,"Invalid Breakpoint Size provided");
+        errorAssert(atoi(optarg) > 0, "Invalid Breakpoint Size provided");
         config.sortingAlgorithmBreakpoint = atoi(optarg);
         break;
       case 'l': 
@@ -140,7 +144,15 @@ void parse_args(int argc,char ** argv) {
   errorAssert(strlen(config.inputFile) > 0,
     "Analyze and Sort - input file name must be previously defined");
   errorAssert(strlen(config.outputFile) > 0,
-    "Analyze and Sort - output file name must be previously defined");
+    "Analyze and Sort - output file name must be previously defined");  
+  if(config.sortingAlgorithmBreakpoint == -1) {
+    warnAssert(false, "Algorithm Breakpoint Size wasn't provided keeping default of 3");
+    config.sortingAlgorithmBreakpoint = 3;
+  }
+  if(config.quickSortPivot == -1) {
+    warnAssert(false, "Quick Sort pivot median wasn't provided keeping default of 1");
+    config.quickSortPivot = 1;
+  }
 }
 
 /**
@@ -156,16 +168,18 @@ Vector* readLexicographicalOrderBlock(
   std::ifstream &inputFile, 
   std::string &buffer
 ) {
-  Vector *lexicographicalOrderTest = new Vector(ALPHABET_DEFAULT_SIZE);
+  Vector *lexicographicalSortOrder = new Vector(ALPHABET_DEFAULT_SIZE);
 
   for(int i = 0; i < ALPHABET_DEFAULT_SIZE; i++) {
     inputFile >> buffer;
-    lexicographicalOrderTest->pushBack(stringToLower(buffer));
+    lexicographicalSortOrder->pushBack(stringToLower(buffer));
   }
+
+  warnAssert(lexicographicalSortOrder->vectorIsFulfilled(), "Lexicographical Sort Order vector wasn't fulfilled by input file");
 
   inputFile >> buffer;
 
-  return lexicographicalOrderTest;
+  return lexicographicalSortOrder;
 }
 
 /**
@@ -186,6 +200,8 @@ Vector* readTextContentBlock(std::ifstream &inputFile, std::string &buffer) {
 
     wordsList.pushBack(formatWord(buffer));
   }
+
+  warnAssert(wordsList.length() > 0, "Empty text found at input file");
   
   return wordsList.retrieveListAsVector();
 }
@@ -227,6 +243,8 @@ InterfaceInputFileHandler inputFileHandler(char inputFileName[]) {
   }
 
   inputFile.close();
+  warnAssert(!(inputFile.is_open()), "\nFailed to close input file");
+
   return InterfaceInputFileHandler {lexicographicalOrder, textWords};
 }
 
@@ -248,19 +266,25 @@ void sortWordsAccordingToLexOrder(
 
   textWords->setLexicographicalSortOrder(lexicographicalOrder);
   textWords->setSortingAlgorithmBreakpoint(config.sortingAlgorithmBreakpoint);
-  textWords->setPivotChoiceRange(config.quickSortPivot);
 
-  for(int i = 0; i < ALPHABET_DEFAULT_SIZE; i++) {
-    std::cout << lexicographicalOrder->getElement(i) << " ";
+  if(config.quickSortPivot > textWords->length()) {
+    warnAssert(false, "Quick Sort pivot median is greater than Vector of text words, keeping default of 1");
+    textWords->setPivotChoiceRange(1);
+  } else {
+    textWords->setPivotChoiceRange(config.quickSortPivot);
   }
-  std::cout << std::endl;
+
+  // for(int i = 0; i < ALPHABET_DEFAULT_SIZE; i++) {
+  //   std::cout << lexicographicalOrder->getElement(i) << " ";
+  // }
+  // std::cout << std::endl;
 
   textWords->sortVector();
 
-  for(int i = 0; i < textWords->length(); i++) {
-    std::cout << textWords->getElement(i) << " ";
-  }
-  std::cout << std::endl;
+  // for(int i = 0; i < textWords->length(); i++) {
+  //   std::cout << textWords->getElement(i) << " ";
+  // }
+  // std::cout << std::endl;
 }
 
 /**
@@ -290,6 +314,7 @@ void printOutputResult(Vector* textWords, char outputFileName[]) {
   outFile << "#FIM" << std::endl;
 
   outFile.close();
+  warnAssert(!(outFile.is_open()), "\nFailed to close output file");
 }
 
 /**

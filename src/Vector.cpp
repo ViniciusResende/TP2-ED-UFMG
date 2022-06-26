@@ -13,6 +13,7 @@ Vector::Vector(int size) {
   this->id = this->_id;
 
   this->value = (std::string*) malloc(this->size * sizeof(std::string));
+  errorAssert(this->value != NULL && this->value != nullptr, "Failed to allocate Vector memory");
 
   this->lastInputtedIndex = -1;
   this->sortingAlgorithmBreakpoint = 3;
@@ -38,7 +39,7 @@ std::string Vector::warmUpVector() {
 }
 
 void Vector::setElement(int idx, std::string value) {
-  errorAssert((idx >= 0) && (idx < this->size), "Invalid Vector index");
+  errorAssert((idx >= 0) && (idx < this->size), "Invalid Vector index while setting element");
 
   this->value[idx] = value;
 
@@ -54,7 +55,7 @@ void Vector::pushBack(std::string value) {
 }
 
 std::string Vector::getElement(int idx) {
-  errorAssert((idx >= 0) && (idx < this->size), "Invalid Vector index");
+  errorAssert((idx >= 0) && (idx < this->size), "Invalid Vector index while getting element");
 
   return this->value[idx];
 }
@@ -77,6 +78,8 @@ int Vector::normalizeCharacter(char c) {
 }
 
 int Vector::getGreaterWord(std::string firstWord, std::string secondWord) {
+  warnAssert((firstWord.size() > 0) && (secondWord.size() > 0), "Shouldn't be comparisons between words involving an empty word");
+
   std::string::size_type firstWordSize = firstWord.size();
   std::string::size_type secondWordSize = secondWord.size();
 
@@ -101,6 +104,9 @@ int Vector::getGreaterWord(std::string firstWord, std::string secondWord) {
 }
 
 void Vector::insertionSort(int leftIdx, int rightIdx) {
+  errorAssert(leftIdx >= 0, "Left index provided is out of boundaries of the current Vector");
+  errorAssert(rightIdx < this->size, "Right index provided is out of boundaries of the current Vector");
+
   int i, j;
   std::string aux;
 
@@ -118,6 +124,9 @@ void Vector::insertionSort(int leftIdx, int rightIdx) {
 }
 
 void Vector::quickSortRecursive(int leftIdx, int rightIdx) {
+  errorAssert(leftIdx >= 0, "Left index provided is out of boundaries of the current Vector");
+  errorAssert(rightIdx < this->size, "Right index provided is out of boundaries of the current Vector");
+
   std::string pivot;
   int pivotIdx;
   if((this->pivotChoiceRange != 1) && (rightIdx - leftIdx >= this->pivotChoiceRange)) {
