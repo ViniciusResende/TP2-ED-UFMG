@@ -48,7 +48,7 @@ bool isValidWordCharacter(char c) {
  * @return Returns the word correctly formatted.
  */
 std::string formatWord(std::string initialString) {
-  warnAssert(initialString.size() > 0, "You shouldn't format an empty word");
+  warnAssert(!initialString.empty(), "You shouldn't format an empty word");
   
   std::string outputString;
   outputString.reserve(initialString.size());
@@ -68,7 +68,7 @@ std::string formatWord(std::string initialString) {
  * @return Returns the string correctly formatted.
  */
 std::string stringToLower(std::string initialString) {
-  warnAssert(initialString.size() > 0, "You shouldn't convert an empty word to lower case");
+  warnAssert(!initialString.empty(), "You shouldn't convert an empty word to lower case");
 
   for (std::string::size_type i = 0; i < initialString.size(); i++) {
     initialString[i] = tolower(initialString[i]);
@@ -116,7 +116,7 @@ void parse_args(int argc,char ** argv) {
 
   // getopt - letra indica a opcao, : junto a letra indica parametro
   // no caso de escolher mais de uma operacao, vale a ultima
-  while ((c = getopt(argc, argv, "i:I:o:O:m:M:s:S:l")) != EOF)
+  while ((c = getopt(argc, argv, "i:I:o:O:m:M:s:S:lp:")) != EOF)
     switch(tolower(c)) {
       case 'i': 
         strcpy(config.inputFile, optarg);
@@ -131,6 +131,9 @@ void parse_args(int argc,char ** argv) {
       case 's':
         errorAssert(atoi(optarg) > 0, "Invalid Breakpoint Size provided");
         config.sortingAlgorithmBreakpoint = atoi(optarg);
+        break;
+      case 'p': 
+        strcpy(config.logname, optarg);
         break;
       case 'l': 
         config.regmem = true;
