@@ -9,14 +9,14 @@ Vector::Vector(int size) {
 
   this->size = size;
 
-  this->_id += 1;
   this->id = this->_id;
+  this->_id += 1;
 
   this->value = (std::string*) malloc(this->size * sizeof(std::string));
   errorAssert(this->value != NULL && this->value != nullptr, "Failed to allocate Vector memory");
 
   this->lastInputtedIndex = -1;
-  this->sortingAlgorithmBreakpoint = 3;
+  this->sortingAlgorithmBreakpoint = 20;
   this->pivotChoiceRange = 1;
 }
 
@@ -33,6 +33,7 @@ std::string Vector::warmUpVector() {
 
   for (int i=1; i<this->size; i++){
     aux = this->value[i];
+    // READMEMLOG((long int) (&(value[i])), sizeof(std::string), this->id);
   }
 
   return aux;
@@ -42,6 +43,7 @@ void Vector::setElement(int idx, std::string value) {
   errorAssert((idx >= 0) && (idx < this->size), "Invalid Vector index while setting element");
 
   this->value[idx] = value;
+  // WRITEMEMLOG((long int) (&(this->value[idx])), sizeof(std::string), this->id);
 
   if(idx > this->lastInputtedIndex)
     this->lastInputtedIndex = idx;
@@ -52,11 +54,14 @@ void Vector::pushBack(std::string value) {
 
   this->lastInputtedIndex += 1;
   this->value[this->lastInputtedIndex] = value;
+
+  // WRITEMEMLOG((long int) (&(this->value[lastInputtedIndex])), sizeof(std::string), this->id);
 }
 
 std::string Vector::getElement(int idx) {
   errorAssert((idx >= 0) && (idx < this->size), "Invalid Vector index while getting element");
 
+  // READMEMLOG((long int) (&(value[idx])), sizeof(std::string), this->id);
   return this->value[idx];
 }
 
@@ -80,6 +85,9 @@ int Vector::normalizeCharacter(char c) {
 int Vector::getGreaterWord(std::string firstWord, std::string secondWord) {
   warnAssert((firstWord.size() > 0) && (secondWord.size() > 0), "Shouldn't be comparisons between words involving an empty word");
 
+  if(firstWord == secondWord) 
+    return NONE_OF_WORDS_IS_GREATER;
+
   std::string::size_type firstWordSize = firstWord.size();
   std::string::size_type secondWordSize = secondWord.size();
 
@@ -93,9 +101,6 @@ int Vector::getGreaterWord(std::string firstWord, std::string secondWord) {
     else if(normalizeCharacter(firstWord[i]) > normalizeCharacter(secondWord[i]))
       return FIRST_WORD_IS_GREATER;
   }
-
-  if(firstWordSize == secondWordSize) 
-    return NONE_OF_WORDS_IS_GREATER;
 
   if(firstWordSize > secondWordSize)
     return FIRST_WORD_IS_GREATER;
@@ -112,14 +117,19 @@ void Vector::insertionSort(int leftIdx, int rightIdx) {
 
   for (i = leftIdx + 1; i < rightIdx + 1; i++) {
     aux = this->value[i];
+    // READMEMLOG((long int) (&(this->value[i])), sizeof(std::string), this->id);
     j = i - 1;
 
     while ((j >= 0) && (getGreaterWord(aux, this->value[j]) == SECOND_WORD_IS_GREATER)) {
+      // READMEMLOG((long int) (&(this->value[j])), sizeof(std::string), this->id);
+
       this->value[j + 1] = this->value[j];
+      // WRITEMEMLOG((long int) (&(this->value[j + 1])), sizeof(std::string), this->id);
       j--;
     }
     
     this->value[j + 1] = aux;
+    // WRITEMEMLOG((long int) (&(this->value[j + 1])), sizeof(std::string), this->id);
   }
 }
 
@@ -134,19 +144,32 @@ void Vector::quickSortRecursive(int leftIdx, int rightIdx) {
 
     pivotIdx = (leftIdx + (leftIdx + this->pivotChoiceRange)) / 2;
     pivot = this->value[pivotIdx];
+    // READMEMLOG((long int) (&(this->value[pivotIdx])), sizeof(std::string), this->id);
   } else {
     pivotIdx = (leftIdx + rightIdx) / 2;
     pivot = this->value[pivotIdx];
+    // READMEMLOG((long int) (&(this->value[pivotIdx])), sizeof(std::string), this->id);
   }
 
   int i = leftIdx, j = rightIdx;
 
   while (i <= j) {
-    while(this->getGreaterWord(pivot, this->value[i]) == FIRST_WORD_IS_GREATER && i < rightIdx) i++;
-    while(this->getGreaterWord(pivot, this->value[j]) == SECOND_WORD_IS_GREATER && j > leftIdx) j--;
+    while(this->getGreaterWord(pivot, this->value[i]) == FIRST_WORD_IS_GREATER && i < rightIdx) {
+      // READMEMLOG((long int) (&(this->value[i])), sizeof(std::string), this->id);
+      i++;
+    };
+    while(this->getGreaterWord(pivot, this->value[j]) == SECOND_WORD_IS_GREATER && j > leftIdx) {
+      // READMEMLOG((long int) (&(this->value[j])), sizeof(std::string), this->id);
+      j--;
+    };
     
     if(i <= j) {
       swap(this->value[i], this->value[j]);
+
+      // READMEMLOG((long int) (&(this->value[i])), sizeof(std::string), this->id);
+      // READMEMLOG((long int) (&(this->value[j])), sizeof(std::string), this->id);
+      // WRITEMEMLOG((long int) (&(this->value[i])), sizeof(std::string), this->id);
+      // WRITEMEMLOG((long int) (&(this->value[j])), sizeof(std::string), this->id);
 
       i++;
       j--;
@@ -181,7 +204,7 @@ void Vector::setLexicographicalSortOrder(Vector* lexicographicalSortOrder) {
 
 void  Vector::setSortingAlgorithmBreakpoint(int sortingAlgorithmBreakpoint) {
   bool isValueValid = sortingAlgorithmBreakpoint >= 1;
-  warnAssert(isValueValid, "Invalid value for sorting algorithm breakpoint, keeping default of 3");
+  warnAssert(isValueValid, "Invalid value for sorting algorithm breakpoint, keeping default of 20");
 
   if(isValueValid) 
     this->sortingAlgorithmBreakpoint = sortingAlgorithmBreakpoint;
