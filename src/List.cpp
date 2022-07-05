@@ -1,11 +1,11 @@
 #include "List.hpp"
 #include "msgassert.h"
 
-int List::_id = 0;
+int List::_id = 2;
 
 List::List() {
-  this->_id += 1;
   this->id = this->_id;
+  this->_id += 1;
 
   this->size = 0;
 
@@ -24,6 +24,7 @@ std::string List::getElement(int idx) {
 
   cellPointer = this->setPosition(idx, false);
 
+  // READMEMLOG((long int) (&(cellPointer->value)), sizeof(std::string), this->id);
   return cellPointer->value;
 }
 
@@ -37,6 +38,7 @@ void List::pushBack(std::string value) {
   this->tail = newCell;
 
   this->size++;
+  // WRITEMEMLOG((long int) (&(newCell->value)), sizeof(std::string), this->id);
 }
 
 std::string List::popFront() {
@@ -60,14 +62,15 @@ std::string List::popFront() {
 Vector* List::retrieveListAsVector() {
   errorAssert(this->size > 0, "Can't create a Vector from an empty List");
 
-  Vector *newVec = new Vector(this->size);
+  Vector *newVec = new Vector(this->size - 1);
   
   ListCell *cellPointer = this->head;
   
-  for (int i = 0; i < this->size; i++) {
+  for (int i = 0; i < this->size - 1; i++) {
     cellPointer = cellPointer->next;
 
     newVec->pushBack(cellPointer->value);
+    // READMEMLOG((long int) (&(cellPointer->value)), sizeof(std::string), this->id);
   }
 
   return newVec;
