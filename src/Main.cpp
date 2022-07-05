@@ -41,6 +41,30 @@ bool isValidWordCharacter(char c) {
 }
 
 /**
+ * @brief Helper function that will remove unexpected accented characters of a given word.
+ *
+ * @param initialString Word to be formatted.
+ * 
+ * @return Returns the word correctly formatted.
+ */
+std::string removeAccented(std::string initialString) {
+  std::string invalidChars[12] = {"á", "é", "í", "ó", "ú", "â", "ê", "ô", "ã", "õ", "à", "ç"};
+  std::string invalidCharsCorrections[12] = {"a", "e", "i", "o", "u", "a", "e", "o", "a", "o", "a", "c"};
+
+  std::string currentCharGroup;
+  for(std::string::size_type i = 0; i < initialString.size(); i++) {
+    currentCharGroup = initialString.substr(i, 2);
+    for (int j = 0; j < 12; j++) {
+        if(currentCharGroup == invalidChars[j]) {
+          initialString.replace(i, 2, invalidCharsCorrections[j]);
+        }
+      }
+  }
+
+  return initialString;
+}
+
+/**
  * @brief Helper function that will remove unexpected characters and symbols given an word.
  *
  * @param initialString Word to be formatted.
@@ -49,7 +73,6 @@ bool isValidWordCharacter(char c) {
  */
 std::string formatWord(std::string initialString) {
   warnAssert(!initialString.empty(), "You shouldn't format an empty word");
-  
   std::string outputString;
   outputString.reserve(initialString.size());
   for(std::string::size_type i = 0; i < initialString.size(); ++i) {
@@ -149,8 +172,8 @@ void parse_args(int argc,char ** argv) {
   errorAssert(strlen(config.outputFile) > 0,
     "Analyze and Sort - output file name must be previously defined");  
   if(config.sortingAlgorithmBreakpoint == -1) {
-    warnAssert(false, "Algorithm Breakpoint Size wasn't provided keeping default of 3");
-    config.sortingAlgorithmBreakpoint = 3;
+    warnAssert(false, "Algorithm Breakpoint Size wasn't provided keeping default of 20");
+    config.sortingAlgorithmBreakpoint = 20;
   }
   if(config.quickSortPivot == -1) {
     warnAssert(false, "Quick Sort pivot median wasn't provided keeping default of 1");
@@ -196,13 +219,30 @@ Vector* readLexicographicalOrderBlock(
  */
 Vector* readTextContentBlock(std::ifstream &inputFile, std::string &buffer) {
   List wordsList = List();
+
+  bool lastReadEndsWithHyphen = false;
+  std::string wordHolder;
+
   while (!inputFile.eof()) {
     inputFile >> buffer;
 
     if(buffer == LEXICOGRAPHICAL_BLOCK_DELIMITER) break;
 
-    wordsList.pushBack(formatWord(buffer));
+    if(buffer.back() == '-' && buffer.size() > 1) {
+      lastReadEndsWithHyphen = true;
+      wordHolder = buffer;
+    } else {
+      if(lastReadEndsWithHyphen) {
+        buffer = wordHolder + buffer;
+        lastReadEndsWithHyphen = false;
+      }
+
+      wordsList.pushBack(removeAccented(formatWord(buffer)));
+    }
   }
+
+  if(lastReadEndsWithHyphen)
+    wordsList.pushBack(removeAccented(formatWord(wordHolder)));
 
   warnAssert(wordsList.length() > 0, "Empty text found at input file");
   
@@ -224,6 +264,8 @@ struct InterfaceInputFileHandler {
  * order and a Vector with the read text words.
  */
 InterfaceInputFileHandler inputFileHandler(char inputFileName[]) {
+  setFaseMemLog(0);
+
   std::ifstream inputFile(inputFileName);
   errorAssert(inputFile.is_open(), "\nFailed to open input file");
 
@@ -263,6 +305,8 @@ void sortWordsAccordingToLexOrder(
   Vector* lexicographicalOrder, 
   Vector* textWords
 ) {
+  setFaseMemLog(1);
+
   errorAssert(lexicographicalOrder->length() == ALPHABET_DEFAULT_SIZE, 
     "Lexicographical Order Vector must be fully filled");
   errorAssert(textWords > 0, "Text Word Vector must have at least one word");
@@ -277,17 +321,8 @@ void sortWordsAccordingToLexOrder(
     textWords->setPivotChoiceRange(config.quickSortPivot);
   }
 
-  // for(int i = 0; i < ALPHABET_DEFAULT_SIZE; i++) {
-  //   std::cout << lexicographicalOrder->getElement(i) << " ";
-  // }
-  // std::cout << std::endl;
-
+  // textWords->warmUpVector();
   textWords->sortVector();
-
-  // for(int i = 0; i < textWords->length(); i++) {
-  //   std::cout << textWords->getElement(i) << " ";
-  // }
-  // std::cout << std::endl;
 }
 
 /**
@@ -298,8 +333,11 @@ void sortWordsAccordingToLexOrder(
  * @param outputFileName A string containing the execution output file name.
  */
 void printOutputResult(Vector* textWords, char outputFileName[]) {
+  setFaseMemLog(2);
+
   std::ofstream outFile(outputFileName);
   errorAssert(outFile.is_open(), "\nFailed to open output file");
+  // textWords->warmUpVector();
 
   int currentWordRepetitionsAcc = 1;
   for (int i = 1; i < textWords->length(); i++) {
